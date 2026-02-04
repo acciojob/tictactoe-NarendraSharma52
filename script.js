@@ -7,9 +7,9 @@ let turn = 0;
 let boardState = Array(9).fill(null);
 
 const wins = [
-    [0,1,2], [3,4,5], [6,7,8],
-    [0,3,6], [1,4,7], [2,5,8],
-    [0,4,8], [2,4,6]
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6]
 ];
 
 submit.addEventListener("click", startGame);
@@ -46,7 +46,7 @@ function startGame() {
 function handleMove(e) {
     const index = e.target.id - 1;
 
-    if (boardState[index] !== null) return;
+    if (boardState[index] !== null) return; // Prevent overwriting a cell
 
     const mark = turn === 0 ? "X" : "O";
     e.target.innerText = mark;
@@ -62,12 +62,13 @@ function handleMove(e) {
             document.getElementById(i + 1).classList.add("winner");
         });
         message.innerText = `${players[turn]} congratulations you won!`;
-        cells.forEach(cell => cell.classList.add("disabled"));
+        cells.forEach(cell => cell.classList.add("disabled")); // Disable all cells
         return;
     }
 
     if (!boardState.includes(null)) {
         message.innerText = "It's a draw!";
+        cells.forEach(cell => cell.classList.add("disabled")); // Disable all cells
         return;
     }
 
