@@ -3,7 +3,7 @@ const message = document.querySelector(".message");
 const cells = document.querySelectorAll(".cell");
 
 let players = [];
-let turn = 0; //player 1
+let turn = 0; // player 1
 let boardState = Array(9).fill(null);
 
 const wins = [
@@ -13,61 +13,73 @@ const wins = [
 ];
 
 function startGame() {
-   const p1 = document.querySelector("#player-1").value.trim();
-   const p2 = document.querySelector("#player-2").value.trim();
-   console.log("Player 1 and 2 are:", p1, p2);
+    const p1 = document.querySelector("#player-1").value.trim();
+    const p2 = document.querySelector("#player-2").value.trim();
 
-   if(!p1 || !p2) {
-    alert("Please enter both the player names");
-    return;
-   }
-
-   players = [p1, p2];
-   console.log(players);
-
-   document.querySelector(".userDetails").style.display = "none";
-   document.querySelector(".message").style.display = "block";
-   document.querySelector(".board").style.display = "grid";
-
-   message.innerText = `${players[turn]} you are up!`;
-   renderBoard();
-}
-
-submit.addEventListener('click', startGame);
-
-function renderBoard() {
-    cells.forEach((cell) => {
-        cell.addEventListener('click', handleMove);
-    })
-}
-
-function handleMove(e) {
-    const id = e.target.id; //Which cell was clicked
-    let mark = turn === 0 ? "X" : "O"; //It is selecting X or O based on the player
-    e.target.innerText = mark;  //UI (adding that mark in UI)
-    boardState[id - 1] = mark;  //array (storing the mark in the board)
-    e.target.classList.add("disabled"); //so that user can't click on that cell again
-
-    console.log(boardState);
-
-    const winningLine = wins.find(line => line.every(i => boardState[i] === mark));
-
-    if(winningLine) {
-        console.log(winningLine);
-
-        winningLine.forEach(i => {
-            document.getElementById(i+1).classList.add("winner");
-        })
-
-        message.innerText = `${players[turn]} congratulations you won!`;
-
-        cells.forEach((cell) => {
-            cell.classList.add("disabled");
-        })
-
+    if (!p1 || !p2) {
+        alert("Please enter both the player names");
         return;
     }
 
-    turn = 1 - turn; //changing the turn to next player
+    // ✅ RESET GAME STATE (IMPORTANT)
+    players = [p1, p2];
+    turn = 0;
+    boardState = Array(9).fill(null);
+
+    cells.forEach(cell => {
+        cell.innerText = "";
+        cell.classList.remove("disabled", "winner");
+    });
+
+    document.querySelector(".userDetails").style.display = "none";
+    document.querySelector(".message").style.display = "block";
+    document.querySelector(".board").style.display = "grid";
+
+    message.innerText = `${players[turn]} you are up!`;
+}
+
+submit.addEventListener("click", startGame);
+
+// attach click only once
+cells.forEach(cell => {
+    cell.addEventListener("click", handleMove);
+});
+
+function handleMove(e) {
+    const id = e.target.id;
+
+    // ✅ SAFETY CHECK (important for tests)
+    if (boardState[id - 1] !== null) return;
+
+    const mark = turn === 0 ? "X" : "O";
+
+    e.target.innerText = mark;
+    boardState[id - 1] = mark;
+    e.target.classList.add("disabled");
+
+    const winningLine = wins.find(line =>
+        line.every(i => boardState[i] === mark)
+    );
+
+    // ✅ WIN CONDITION
+    if (winningLine) {
+        winningLine.forEach(i => {
+            document.getElementById(i + 1).classList.add("winner");
+        });
+
+        message.innerText = `${players[turn]} congratulations you won!`;
+        cells.forEach(cell => cell.classList.add("disabled"));
+        return;
+    }
+
+    // ✅ DRAW CONDITION (THIS WAS MISSING)
+    if (!boardState.includes(null)) {
+        message.innerText = "It's a draw!";
+        cells.forEach(cell => cell.classList.add("disabled"));
+        return;
+    }
+
+    // NEXT TURN
+    turn = 1 - turn;
     message.innerText = `${players[turn]} you are up!`;
 }
