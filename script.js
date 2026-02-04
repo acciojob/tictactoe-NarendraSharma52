@@ -1,4 +1,3 @@
-//your JS code here. If required.
 const submit = document.querySelector("#submit");
 const message = document.querySelector(".message");
 const cells = document.querySelectorAll(".cell");
